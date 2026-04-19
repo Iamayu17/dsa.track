@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Practice Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2236;
+  --surface3: #1e2d42;
+  --border: #1e3a5f;
+  --border2: #2a4a70;
+  --accent: #3b82f6;
+  --accent2: #60a5fa;
+  --accent-dim: rgba(59,130,246,0.12);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --yellow: #f59e0b;
+  --yellow-dim: rgba(245,158,11,0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --orange: #f97316;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── Header ── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,14,26,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+
+.logo {
+  font-family: var(--mono);
+  font-size: 18px; font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--text3); }
+
+.header-stats {
+  display: flex; gap: 16px; align-items: center;
+}
+.stat-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px;
+  font-family: var(--mono); font-size: 12px;
+}
+.stat-pill .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+
+/* ── Progress Bar ── */
+.progress-section {
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+.progress-pct { font-size: 12px; color: var(--accent2); font-family: var(--mono); }
+.progress-bar-bg {
+  height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden;
+  display: flex;
+}
+.progress-bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), #818cf8);
+  transition: width 0.5s ease; border-radius: 3px;
+}
+.progress-breakdown {
+  display: flex; gap: 20px; margin-top: 10px;
+}
+.pb-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); font-family: var(--mono); }
+.pb-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+/* ── Toolbar ── */
+.toolbar {
+  padding: 12px 24px;
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); }
+input[type="text"] {
+  width: 100%; padding: 7px 10px 7px 34px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text); font-family: var(--sans); font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+}
+input[type="text"]:focus { border-color: var(--accent); }
+input[type="text"]::placeholder { color: var(--text3); }
+
+select {
+  padding: 7px 10px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text); font-family: var(--sans); font-size: 13px;
+  outline: none; cursor: pointer; transition: border-color 0.2s;
+}
+select:focus { border-color: var(--accent); }
+
+.btn {
+  padding: 7px 14px; border-radius: var(--radius); font-family: var(--sans);
+  font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid;
+  transition: all 0.15s; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.btn-ghost {
+  background: transparent; border-color: var(--border); color: var(--text2);
+}
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); background: var(--surface); }
+.btn-ghost.active { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+.btn-danger { background: transparent; border-color: var(--red); color: var(--red); }
+.btn-danger:hover { background: var(--red-dim); }
+
+.toolbar-right { display: flex; gap: 8px; margin-left: auto; }
+
+/* ── Category sections ── */
+.container { padding: 16px 24px; max-width: 1200px; margin: 0 auto; }
+
+.category {
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.category-header {
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+.category-header:hover { background: var(--surface2); }
+
+.cat-chevron {
+  transition: transform 0.2s;
+  color: var(--text3); flex-shrink: 0;
+}
+.cat-chevron.open { transform: rotate(90deg); }
+
+.cat-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+
+.cat-name {
+  font-weight: 600; font-size: 14px; flex: 1;
+}
+.cat-count {
+  font-family: var(--mono); font-size: 11px; color: var(--text3);
+}
+
+.cat-progress-mini {
+  display: flex; align-items: center; gap: 8px;
+}
+.mini-bar {
+  width: 80px; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden;
+}
+.mini-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+.mini-pct { font-family: var(--mono); font-size: 11px; color: var(--text2); min-width: 32px; text-align: right; }
+
+/* ── Problems table ── */
+.problems-table {
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.problems-table.open { display: block; }
+
+.table-header {
+  display: grid;
+  grid-template-columns: 36px 1fr 90px 90px 100px 80px 60px;
+  gap: 8px; padding: 8px 18px;
+  background: var(--surface2);
+  font-size: 11px; color: var(--text3); font-family: var(--mono);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.problem-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 90px 90px 100px 80px 60px;
+  gap: 8px; padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.1s;
+  cursor: default;
+}
+.problem-row:last-child { border-bottom: none; }
+.problem-row:hover { background: rgba(255,255,255,0.02); }
+.problem-row.solved { background: rgba(34,197,94,0.03); }
+
+/* checkbox */
+.check-col {
+  display: flex; align-items: center; justify-content: center;
+}
+.check {
+  width: 18px; height: 18px; border: 2px solid var(--border2);
+  border-radius: 4px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: all 0.15s; flex-shrink: 0;
+  background: transparent;
+}
+.check:hover { border-color: var(--green); }
+.check.checked { background: var(--green); border-color: var(--green); }
+.check.checked::after {
+  content: '✓'; color: #fff; font-size: 11px; font-weight: 700;
+}
+
+.prob-name {
+  display: flex; align-items: center; gap: 8px;
+}
+.prob-link {
+  color: var(--text); text-decoration: none; font-size: 13px;
+  transition: color 0.15s;
+}
+.prob-link:hover { color: var(--accent2); }
+.prob-link.solved-text { color: var(--text3); text-decoration: line-through; }
+
+.diff-badge {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+}
+.diff-easy { color: var(--green); background: var(--green-dim); }
+.diff-medium { color: var(--yellow); background: var(--yellow-dim); }
+.diff-hard { color: var(--red); background: var(--red-dim); }
+
+.company-tags {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.company-tag {
+  font-family: var(--mono); font-size: 10px; color: var(--text3);
+  background: var(--surface3); padding: 1px 6px; border-radius: 3px;
+}
+
+.action-btns {
+  display: flex; gap: 6px; align-items: center;
+}
+.icon-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  border-radius: 4px; transition: all 0.15s; color: var(--text3);
+  display: flex; align-items: center;
+}
+.icon-btn:hover { color: var(--text); background: var(--surface3); }
+.icon-btn.bookmarked { color: var(--yellow); }
+.icon-btn.has-note { color: var(--accent2); }
+
+.no-results {
+  padding: 40px; text-align: center; color: var(--text3);
+  font-size: 14px;
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); width: 100%; max-width: 560px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.modal-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.modal-title { font-weight: 600; font-size: 15px; }
+.modal-subtitle { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+.modal-close {
+  background: none; border: none; cursor: pointer; color: var(--text3);
+  padding: 4px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px; }
+.modal-body textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text); font-family: var(--mono);
+  font-size: 13px; padding: 12px; resize: vertical; min-height: 160px;
+  outline: none; transition: border-color 0.2s; line-height: 1.6;
+}
+.modal-body textarea:focus { border-color: var(--accent); }
+.modal-body textarea::placeholder { color: var(--text3); }
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 12px 18px;
+  font-size: 13px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 2000; opacity: 0; transform: translateY(8px);
+  transition: all 0.25s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── Empty state ── */
+.empty-cats { padding: 60px 24px; text-align: center; color: var(--text3); }
+.empty-cats h3 { font-size: 18px; margin-bottom: 8px; color: var(--text2); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .table-header { display: none; }
+  .problem-row {
+    grid-template-columns: 36px 1fr auto;
+    grid-template-rows: auto auto;
+  }
+  .prob-name { grid-column: 2; }
+  .diff-col { grid-column: 3; }
+  .company-col, .time-col { display: none; }
+  .actions-col { grid-column: 3; grid-row: 2; }
+  .check-col { grid-row: 1 / 3; }
+  .header-stats { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo">dsa<span>.</span>track</div>
+  </div>
+  <div class="header-stats" id="headerStats"></div>
+</header>
+
+<!-- Progress -->
+<div class="progress-section">
+  <div class="progress-row">
+    <span class="progress-label">Overall Progress</span>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-breakdown" id="progressBreakdown"></div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="Search problems…">
+  </div>
+  <select id="diffFilter">
+    <option value="">All Difficulties</option>
+    <option value="Easy">Easy</option>
+    <option value="Medium">Medium</option>
+    <option value="Hard">Hard</option>
+  </select>
+  <select id="companyFilter">
+    <option value="">All Companies</option>
+    <option value="Google">Google</option>
+    <option value="Meta">Meta</option>
+    <option value="Amazon">Amazon</option>
+    <option value="Apple">Apple</option>
+    <option value="Microsoft">Microsoft</option>
+    <option value="Netflix">Netflix</option>
+    <option value="Uber">Uber</option>
+    <option value="Airbnb">Airbnb</option>
+  </select>
+  <button class="btn btn-ghost" id="bookmarkFilterBtn" onclick="toggleBookmarkFilter()">
+    <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3h14a1 1 0 0 1 1 1v17l-7-3-7 3V4a1 1 0 0 1 1-1z"/></svg>
+    Bookmarks
+  </button>
+  <div class="toolbar-right">
+    <button class="btn btn-ghost" onclick="exportData()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </button>
+    <label class="btn btn-ghost" style="cursor:pointer">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import
+      <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+    </label>
+    <button class="btn btn-danger" onclick="resetConfirm()">Reset</button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container" id="categoriesContainer"></div>
+
+<!-- Notes Modal -->
+<div class="modal-overlay" id="notesModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Problem Notes</div>
+        <div class="modal-subtitle" id="modalSubtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <textarea id="noteTextarea" placeholder="Add notes, hints, approaches, code snippets…&#10;&#10;Supports plain text — use this for:&#10;• Key insights / algorithm notes&#10;• Time & space complexity&#10;• Edge cases to remember&#10;• Your solution approach"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════
+const CATEGORIES = [
+  {
+    id:"arrays", name:"Arrays & Hashing", icon:"🗂️", color:"#3b82f6",
+    problems:[
+      {id:"contains-duplicate", name:"Contains Duplicate", diff:"Easy", companies:["Amazon","Google"], url:"https://leetcode.com/problems/contains-duplicate/"},
+      {id:"valid-anagram", name:"Valid Anagram", diff:"Easy", companies:["Amazon","Facebook"], url:"https://leetcode.com/problems/valid-anagram/"},
+      {id:"two-sum", name:"Two Sum", diff:"Easy", companies:["Google","Amazon","Apple","Meta"], url:"https://leetcode.com/problems/two-sum/"},
+      {id:"group-anagrams", name:"Group Anagrams", diff:"Medium", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/group-anagrams/"},
+      {id:"top-k-frequent", name:"Top K Frequent Elements", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/top-k-frequent-elements/"},
+      {id:"encode-decode-strings", name:"Encode and Decode Strings", diff:"Medium", companies:["Google","Microsoft"], url:"https://leetcode.com/problems/encode-and-decode-strings/"},
+      {id:"product-except-self", name:"Product of Array Except Self", diff:"Medium", companies:["Amazon","Facebook","Microsoft"], url:"https://leetcode.com/problems/product-of-array-except-self/"},
+      {id:"valid-sudoku", name:"Valid Sudoku", diff:"Medium", companies:["Amazon","Uber"], url:"https://leetcode.com/problems/valid-sudoku/"},
+      {id:"longest-consecutive", name:"Longest Consecutive Sequence", diff:"Medium", companies:["Google","Amazon","Apple"], url:"https://leetcode.com/problems/longest-consecutive-sequence/"},
+    ]
+  },
+  {
+    id:"two-pointers", name:"Two Pointers", icon:"👆", color:"#8b5cf6",
+    problems:[
+      {id:"valid-palindrome", name:"Valid Palindrome", diff:"Easy", companies:["Facebook","Microsoft"], url:"https://leetcode.com/problems/valid-palindrome/"},
+      {id:"two-sum-ii", name:"Two Sum II", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"},
+      {id:"3sum", name:"3Sum", diff:"Medium", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/3sum/"},
+      {id:"container-most-water", name:"Container With Most Water", diff:"Medium", companies:["Amazon","Google","Meta"], url:"https://leetcode.com/problems/container-with-most-water/"},
+      {id:"trapping-rain-water", name:"Trapping Rain Water", diff:"Hard", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/trapping-rain-water/"},
+    ]
+  },
+  {
+    id:"sliding-window", name:"Sliding Window", icon:"🪟", color:"#06b6d4",
+    problems:[
+      {id:"best-time-stock", name:"Best Time to Buy and Sell Stock", diff:"Easy", companies:["Amazon","Facebook","Apple"], url:"https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"},
+      {id:"longest-substring", name:"Longest Substring Without Repeating Characters", diff:"Medium", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/longest-substring-without-repeating-characters/"},
+      {id:"longest-repeating-char", name:"Longest Repeating Character Replacement", diff:"Medium", companies:["Google"], url:"https://leetcode.com/problems/longest-repeating-character-replacement/"},
+      {id:"permutation-in-string", name:"Permutation in String", diff:"Medium", companies:["Amazon","Microsoft"], url:"https://leetcode.com/problems/permutation-in-string/"},
+      {id:"minimum-window-substring", name:"Minimum Window Substring", diff:"Hard", companies:["Facebook","Google","LinkedIn"], url:"https://leetcode.com/problems/minimum-window-substring/"},
+      {id:"sliding-window-maximum", name:"Sliding Window Maximum", diff:"Hard", companies:["Amazon","Google"], url:"https://leetcode.com/problems/sliding-window-maximum/"},
+    ]
+  },
+  {
+    id:"stack", name:"Stack", icon:"📚", color:"#ec4899",
+    problems:[
+      {id:"valid-parentheses", name:"Valid Parentheses", diff:"Easy", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/valid-parentheses/"},
+      {id:"min-stack", name:"Min Stack", diff:"Medium", companies:["Amazon","Google","Uber"], url:"https://leetcode.com/problems/min-stack/"},
+      {id:"reverse-polish-notation", name:"Evaluate Reverse Polish Notation", diff:"Medium", companies:["Amazon","LinkedIn"], url:"https://leetcode.com/problems/evaluate-reverse-polish-notation/"},
+      {id:"generate-parentheses", name:"Generate Parentheses", diff:"Medium", companies:["Google","Amazon","Uber"], url:"https://leetcode.com/problems/generate-parentheses/"},
+      {id:"daily-temperatures", name:"Daily Temperatures", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/daily-temperatures/"},
+      {id:"car-fleet", name:"Car Fleet", diff:"Medium", companies:["Google"], url:"https://leetcode.com/problems/car-fleet/"},
+      {id:"largest-rectangle-histogram", name:"Largest Rectangle in Histogram", diff:"Hard", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/largest-rectangle-in-histogram/"},
+    ]
+  },
+  {
+    id:"binary-search", name:"Binary Search", icon:"🔎", color:"#10b981",
+    problems:[
+      {id:"binary-search", name:"Binary Search", diff:"Easy", companies:["Google","Amazon"], url:"https://leetcode.com/problems/binary-search/"},
+      {id:"search-2d-matrix", name:"Search a 2D Matrix", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/search-a-2d-matrix/"},
+      {id:"koko-eating-bananas", name:"Koko Eating Bananas", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/koko-eating-bananas/"},
+      {id:"find-minimum-rotated", name:"Find Minimum in Rotated Sorted Array", diff:"Medium", companies:["Amazon","Microsoft","Google"], url:"https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"},
+      {id:"search-rotated", name:"Search in Rotated Sorted Array", diff:"Medium", companies:["Amazon","Facebook","Microsoft"], url:"https://leetcode.com/problems/search-in-rotated-sorted-array/"},
+      {id:"time-based-key-value", name:"Time Based Key-Value Store", diff:"Medium", companies:["Google"], url:"https://leetcode.com/problems/time-based-key-value-store/"},
+      {id:"median-two-sorted", name:"Median of Two Sorted Arrays", diff:"Hard", companies:["Google","Amazon","Apple"], url:"https://leetcode.com/problems/median-of-two-sorted-arrays/"},
+    ]
+  },
+  {
+    id:"linked-list", name:"Linked List", icon:"🔗", color:"#f59e0b",
+    problems:[
+      {id:"reverse-linked-list", name:"Reverse Linked List", diff:"Easy", companies:["Amazon","Apple","Microsoft"], url:"https://leetcode.com/problems/reverse-linked-list/"},
+      {id:"merge-two-sorted-lists", name:"Merge Two Sorted Lists", diff:"Easy", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/merge-two-sorted-lists/"},
+      {id:"reorder-list", name:"Reorder List", diff:"Medium", companies:["Amazon","Facebook"], url:"https://leetcode.com/problems/reorder-list/"},
+      {id:"remove-nth-from-end", name:"Remove Nth Node From End", diff:"Medium", companies:["Amazon","Microsoft","Google"], url:"https://leetcode.com/problems/remove-nth-node-from-end-of-list/"},
+      {id:"linked-list-cycle", name:"Linked List Cycle", diff:"Easy", companies:["Amazon","Microsoft","Apple"], url:"https://leetcode.com/problems/linked-list-cycle/"},
+      {id:"find-duplicate-number", name:"Find the Duplicate Number", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/find-the-duplicate-number/"},
+      {id:"lru-cache", name:"LRU Cache", diff:"Medium", companies:["Amazon","Google","Facebook","Microsoft"], url:"https://leetcode.com/problems/lru-cache/"},
+      {id:"merge-k-sorted", name:"Merge K Sorted Lists", diff:"Hard", companies:["Amazon","Google","Uber"], url:"https://leetcode.com/problems/merge-k-sorted-lists/"},
+      {id:"reverse-nodes-k-group", name:"Reverse Nodes in k-Group", diff:"Hard", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/reverse-nodes-in-k-group/"},
+    ]
+  },
+  {
+    id:"trees", name:"Trees", icon:"🌲", color:"#22c55e",
+    problems:[
+      {id:"invert-binary-tree", name:"Invert Binary Tree", diff:"Easy", companies:["Google","Apple","Amazon"], url:"https://leetcode.com/problems/invert-binary-tree/"},
+      {id:"max-depth-binary-tree", name:"Maximum Depth of Binary Tree", diff:"Easy", companies:["Amazon","Google","LinkedIn"], url:"https://leetcode.com/problems/maximum-depth-of-binary-tree/"},
+      {id:"diameter-binary-tree", name:"Diameter of Binary Tree", diff:"Easy", companies:["Google","Facebook"], url:"https://leetcode.com/problems/diameter-of-binary-tree/"},
+      {id:"balanced-binary-tree", name:"Balanced Binary Tree", diff:"Easy", companies:["Amazon","Google"], url:"https://leetcode.com/problems/balanced-binary-tree/"},
+      {id:"same-tree", name:"Same Tree", diff:"Easy", companies:["Amazon","Google"], url:"https://leetcode.com/problems/same-tree/"},
+      {id:"subtree-another-tree", name:"Subtree of Another Tree", diff:"Easy", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/subtree-of-another-tree/"},
+      {id:"lca-bst", name:"Lowest Common Ancestor of BST", diff:"Medium", companies:["Amazon","Facebook","Microsoft"], url:"https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/"},
+      {id:"bfs-binary-tree", name:"Binary Tree Level Order Traversal", diff:"Medium", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/binary-tree-level-order-traversal/"},
+      {id:"right-side-view", name:"Binary Tree Right Side View", diff:"Medium", companies:["Facebook","Amazon","ByteDance"], url:"https://leetcode.com/problems/binary-tree-right-side-view/"},
+      {id:"count-good-nodes", name:"Count Good Nodes in Binary Tree", diff:"Medium", companies:["Microsoft","Google"], url:"https://leetcode.com/problems/count-good-nodes-in-binary-tree/"},
+      {id:"validate-bst", name:"Validate Binary Search Tree", diff:"Medium", companies:["Amazon","Facebook","Bloomberg"], url:"https://leetcode.com/problems/validate-binary-search-tree/"},
+      {id:"kth-smallest-bst", name:"Kth Smallest Element in BST", diff:"Medium", companies:["Google","Amazon","Bloomberg"], url:"https://leetcode.com/problems/kth-smallest-element-in-a-bst/"},
+      {id:"construct-preorder-inorder", name:"Construct Tree from Preorder/Inorder", diff:"Medium", companies:["Amazon","Microsoft","Google"], url:"https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"},
+      {id:"binary-tree-max-path-sum", name:"Binary Tree Maximum Path Sum", diff:"Hard", companies:["Facebook","Amazon","Google"], url:"https://leetcode.com/problems/binary-tree-maximum-path-sum/"},
+      {id:"serialize-deserialize-bt", name:"Serialize and Deserialize Binary Tree", diff:"Hard", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"},
+    ]
+  },
+  {
+    id:"tries", name:"Tries", icon:"🔤", color:"#a78bfa",
+    problems:[
+      {id:"implement-trie", name:"Implement Trie (Prefix Tree)", diff:"Medium", companies:["Google","Amazon","Facebook"], url:"https://leetcode.com/problems/implement-trie-prefix-tree/"},
+      {id:"design-add-search", name:"Design Add and Search Words Data Structure", diff:"Medium", companies:["Facebook"], url:"https://leetcode.com/problems/design-add-and-search-words-data-structure/"},
+      {id:"word-search-ii", name:"Word Search II", diff:"Hard", companies:["Amazon","Microsoft","Google"], url:"https://leetcode.com/problems/word-search-ii/"},
+    ]
+  },
+  {
+    id:"heap-priority-queue", name:"Heap / Priority Queue", icon:"⛰️", color:"#f97316",
+    problems:[
+      {id:"kth-largest-element", name:"Kth Largest Element in a Stream", diff:"Easy", companies:["Amazon","Google"], url:"https://leetcode.com/problems/kth-largest-element-in-a-stream/"},
+      {id:"last-stone-weight", name:"Last Stone Weight", diff:"Easy", companies:["Amazon","Google"], url:"https://leetcode.com/problems/last-stone-weight/"},
+      {id:"k-closest-origin", name:"K Closest Points to Origin", diff:"Medium", companies:["Facebook","Amazon","Microsoft"], url:"https://leetcode.com/problems/k-closest-points-to-origin/"},
+      {id:"kth-largest-array", name:"Kth Largest Element in an Array", diff:"Medium", companies:["Facebook","Amazon","Google"], url:"https://leetcode.com/problems/kth-largest-element-in-an-array/"},
+      {id:"task-scheduler", name:"Task Scheduler", diff:"Medium", companies:["Facebook","Amazon","Apple"], url:"https://leetcode.com/problems/task-scheduler/"},
+      {id:"design-twitter", name:"Design Twitter", diff:"Medium", companies:["Twitter"], url:"https://leetcode.com/problems/design-twitter/"},
+      {id:"find-median-data-stream", name:"Find Median from Data Stream", diff:"Hard", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/find-median-from-data-stream/"},
+    ]
+  },
+  {
+    id:"backtracking", name:"Backtracking", icon:"↩️", color:"#ef4444",
+    problems:[
+      {id:"subsets", name:"Subsets", diff:"Medium", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/subsets/"},
+      {id:"combination-sum", name:"Combination Sum", diff:"Medium", companies:["Amazon","Apple","Uber"], url:"https://leetcode.com/problems/combination-sum/"},
+      {id:"permutations", name:"Permutations", diff:"Medium", companies:["Microsoft","LinkedIn","Adobe"], url:"https://leetcode.com/problems/permutations/"},
+      {id:"subsets-ii", name:"Subsets II", diff:"Medium", companies:["Amazon","Facebook"], url:"https://leetcode.com/problems/subsets-ii/"},
+      {id:"combination-sum-ii", name:"Combination Sum II", diff:"Medium", companies:["Airbnb"], url:"https://leetcode.com/problems/combination-sum-ii/"},
+      {id:"word-search", name:"Word Search", diff:"Medium", companies:["Amazon","Microsoft","Facebook"], url:"https://leetcode.com/problems/word-search/"},
+      {id:"palindrome-partitioning", name:"Palindrome Partitioning", diff:"Medium", companies:["Amazon","Apple","Google"], url:"https://leetcode.com/problems/palindrome-partitioning/"},
+      {id:"n-queens", name:"N-Queens", diff:"Hard", companies:["Amazon","Google"], url:"https://leetcode.com/problems/n-queens/"},
+    ]
+  },
+  {
+    id:"graphs", name:"Graphs", icon:"🕸️", color:"#14b8a6",
+    problems:[
+      {id:"number-of-islands", name:"Number of Islands", diff:"Medium", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/number-of-islands/"},
+      {id:"max-area-island", name:"Max Area of Island", diff:"Medium", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/max-area-of-island/"},
+      {id:"clone-graph", name:"Clone Graph", diff:"Medium", companies:["Facebook","Amazon","Google"], url:"https://leetcode.com/problems/clone-graph/"},
+      {id:"walls-and-gates", name:"Walls and Gates", diff:"Medium", companies:["Facebook","Google"], url:"https://leetcode.com/problems/walls-and-gates/"},
+      {id:"rotting-oranges", name:"Rotting Oranges", diff:"Medium", companies:["Amazon","Google","Uber"], url:"https://leetcode.com/problems/rotting-oranges/"},
+      {id:"pacific-atlantic", name:"Pacific Atlantic Water Flow", diff:"Medium", companies:["Google","Facebook"], url:"https://leetcode.com/problems/pacific-atlantic-water-flow/"},
+      {id:"course-schedule", name:"Course Schedule", diff:"Medium", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/course-schedule/"},
+      {id:"course-schedule-ii", name:"Course Schedule II", diff:"Medium", companies:["Amazon","Facebook","Yelp"], url:"https://leetcode.com/problems/course-schedule-ii/"},
+      {id:"graph-valid-tree", name:"Graph Valid Tree", diff:"Medium", companies:["Google","Zenefits"], url:"https://leetcode.com/problems/graph-valid-tree/"},
+      {id:"redundant-connection", name:"Redundant Connection", diff:"Medium", companies:["Google","Amazon"], url:"https://leetcode.com/problems/redundant-connection/"},
+      {id:"word-ladder", name:"Word Ladder", diff:"Hard", companies:["Amazon","Google","LinkedIn"], url:"https://leetcode.com/problems/word-ladder/"},
+    ]
+  },
+  {
+    id:"advanced-graphs", name:"Advanced Graphs", icon:"⚡", color:"#d946ef",
+    problems:[
+      {id:"reconstruct-itinerary", name:"Reconstruct Itinerary", diff:"Hard", companies:["Google","Uber"], url:"https://leetcode.com/problems/reconstruct-itinerary/"},
+      {id:"min-cost-connect-points", name:"Min Cost to Connect All Points", diff:"Medium", companies:["Google","Amazon"], url:"https://leetcode.com/problems/min-cost-to-connect-all-points/"},
+      {id:"network-delay-time", name:"Network Delay Time", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/network-delay-time/"},
+      {id:"swim-in-rising-water", name:"Swim in Rising Water", diff:"Hard", companies:["Google"], url:"https://leetcode.com/problems/swim-in-rising-water/"},
+      {id:"alien-dictionary", name:"Alien Dictionary", diff:"Hard", companies:["Facebook","Google","Airbnb"], url:"https://leetcode.com/problems/alien-dictionary/"},
+      {id:"cheapest-flights", name:"Cheapest Flights Within K Stops", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/cheapest-flights-within-k-stops/"},
+    ]
+  },
+  {
+    id:"1d-dp", name:"1-D Dynamic Programming", icon:"📈", color:"#84cc16",
+    problems:[
+      {id:"climbing-stairs", name:"Climbing Stairs", diff:"Easy", companies:["Amazon","Google","Apple"], url:"https://leetcode.com/problems/climbing-stairs/"},
+      {id:"min-cost-climbing", name:"Min Cost Climbing Stairs", diff:"Easy", companies:["Amazon","Google"], url:"https://leetcode.com/problems/min-cost-climbing-stairs/"},
+      {id:"house-robber", name:"House Robber", diff:"Medium", companies:["Airbnb","Linkedin","Amazon"], url:"https://leetcode.com/problems/house-robber/"},
+      {id:"house-robber-ii", name:"House Robber II", diff:"Medium", companies:["Airbnb","Linkedin"], url:"https://leetcode.com/problems/house-robber-ii/"},
+      {id:"longest-palindrome-substr", name:"Longest Palindromic Substring", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/longest-palindromic-substring/"},
+      {id:"palindromic-substrings", name:"Palindromic Substrings", diff:"Medium", companies:["LinkedIn","Facebook"], url:"https://leetcode.com/problems/palindromic-substrings/"},
+      {id:"decode-ways", name:"Decode Ways", diff:"Medium", companies:["Facebook","Amazon","Google"], url:"https://leetcode.com/problems/decode-ways/"},
+      {id:"coin-change", name:"Coin Change", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/coin-change/"},
+      {id:"max-product-subarray", name:"Maximum Product Subarray", diff:"Medium", companies:["LinkedIn","Amazon","Google"], url:"https://leetcode.com/problems/maximum-product-subarray/"},
+      {id:"word-break", name:"Word Break", diff:"Medium", companies:["Google","Amazon","Facebook"], url:"https://leetcode.com/problems/word-break/"},
+      {id:"longest-increasing-subseq", name:"Longest Increasing Subsequence", diff:"Medium", companies:["Microsoft","Amazon","Google"], url:"https://leetcode.com/problems/longest-increasing-subsequence/"},
+      {id:"partition-equal-subset", name:"Partition Equal Subset Sum", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/partition-equal-subset-sum/"},
+    ]
+  },
+  {
+    id:"2d-dp", name:"2-D Dynamic Programming", icon:"📊", color:"#fb923c",
+    problems:[
+      {id:"unique-paths", name:"Unique Paths", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/unique-paths/"},
+      {id:"longest-common-subsequence", name:"Longest Common Subsequence", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/longest-common-subsequence/"},
+      {id:"best-time-stock-cooldown", name:"Best Time to Buy & Sell w/ Cooldown", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/"},
+      {id:"coin-change-ii", name:"Coin Change II", diff:"Medium", companies:["Amazon","Apple"], url:"https://leetcode.com/problems/coin-change-ii/"},
+      {id:"target-sum", name:"Target Sum", diff:"Medium", companies:["Amazon","Facebook","Google"], url:"https://leetcode.com/problems/target-sum/"},
+      {id:"interleaving-string", name:"Interleaving String", diff:"Medium", companies:["Google","Amazon"], url:"https://leetcode.com/problems/interleaving-string/"},
+      {id:"edit-distance", name:"Edit Distance", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/edit-distance/"},
+      {id:"burst-balloons", name:"Burst Balloons", diff:"Hard", companies:["Google","Amazon"], url:"https://leetcode.com/problems/burst-balloons/"},
+      {id:"regex-matching", name:"Regular Expression Matching", diff:"Hard", companies:["Facebook","Google","Airbnb"], url:"https://leetcode.com/problems/regular-expression-matching/"},
+    ]
+  },
+  {
+    id:"greedy", name:"Greedy", icon:"💰", color:"#fbbf24",
+    problems:[
+      {id:"maximum-subarray", name:"Maximum Subarray", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/maximum-subarray/"},
+      {id:"jump-game", name:"Jump Game", diff:"Medium", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/jump-game/"},
+      {id:"jump-game-ii", name:"Jump Game II", diff:"Medium", companies:["Amazon","Google"], url:"https://leetcode.com/problems/jump-game-ii/"},
+      {id:"gas-station", name:"Gas Station", diff:"Medium", companies:["Amazon","Google","Bloomberg"], url:"https://leetcode.com/problems/gas-station/"},
+      {id:"hand-of-straights", name:"Hand of Straights", diff:"Medium", companies:["Google"], url:"https://leetcode.com/problems/hand-of-straights/"},
+      {id:"merge-triplets", name:"Merge Triplets to Form Target", diff:"Medium", companies:["Google"], url:"https://leetcode.com/problems/merge-triplets-to-form-target-triplet/"},
+      {id:"partition-labels", name:"Partition Labels", diff:"Medium", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/partition-labels/"},
+      {id:"valid-parenthesis-string", name:"Valid Parenthesis String", diff:"Medium", companies:["Google","Amazon"], url:"https://leetcode.com/problems/valid-parenthesis-string/"},
+    ]
+  },
+  {
+    id:"intervals", name:"Intervals", icon:"📅", color:"#38bdf8",
+    problems:[
+      {id:"insert-interval", name:"Insert Interval", diff:"Medium", companies:["Google","Facebook","LinkedIn"], url:"https://leetcode.com/problems/insert-interval/"},
+      {id:"merge-intervals", name:"Merge Intervals", diff:"Medium", companies:["Facebook","Amazon","Google"], url:"https://leetcode.com/problems/merge-intervals/"},
+      {id:"non-overlapping-intervals", name:"Non-overlapping Intervals", diff:"Medium", companies:["Google","Facebook"], url:"https://leetcode.com/problems/non-overlapping-intervals/"},
+      {id:"meeting-rooms", name:"Meeting Rooms", diff:"Easy", companies:["Google","Facebook","Amazon"], url:"https://leetcode.com/problems/meeting-rooms/"},
+      {id:"meeting-rooms-ii", name:"Meeting Rooms II", diff:"Medium", companies:["Google","Facebook","Amazon","Uber"], url:"https://leetcode.com/problems/meeting-rooms-ii/"},
+      {id:"minimum-interval-query", name:"Minimum Interval to Include Each Query", diff:"Hard", companies:["Google"], url:"https://leetcode.com/problems/minimum-interval-to-include-each-query/"},
+    ]
+  },
+  {
+    id:"bit-manipulation", name:"Bit Manipulation", icon:"🔢", color:"#6366f1",
+    problems:[
+      {id:"single-number", name:"Single Number", diff:"Easy", companies:["Amazon","Google","Apple"], url:"https://leetcode.com/problems/single-number/"},
+      {id:"number-of-1-bits", name:"Number of 1 Bits", diff:"Easy", companies:["Apple","Microsoft","Google"], url:"https://leetcode.com/problems/number-of-1-bits/"},
+      {id:"counting-bits", name:"Counting Bits", diff:"Easy", companies:["Amazon","Google","Microsoft"], url:"https://leetcode.com/problems/counting-bits/"},
+      {id:"reverse-bits", name:"Reverse Bits", diff:"Easy", companies:["Apple","Amazon","Qualcomm"], url:"https://leetcode.com/problems/reverse-bits/"},
+      {id:"missing-number", name:"Missing Number", diff:"Easy", companies:["Microsoft","Amazon","Apple"], url:"https://leetcode.com/problems/missing-number/"},
+      {id:"sum-of-two-integers", name:"Sum of Two Integers", diff:"Medium", companies:["Amazon","Google","Facebook"], url:"https://leetcode.com/problems/sum-of-two-integers/"},
+      {id:"reverse-integer", name:"Reverse Integer", diff:"Medium", companies:["Apple","Bloomberg","Google"], url:"https://leetcode.com/problems/reverse-integer/"},
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+const STORAGE_KEY = 'dsa_tracker_v1';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { solved: {}, bookmarks: {}, notes: {}, openCats: {} };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+let currentNoteId = null;
+let searchQuery = '';
+let diffFilter = '';
+let companyFilter = '';
+let bookmarkFilter = false;
+
+// ══════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════
+function getAllProblems() {
+  return CATEGORIES.flatMap(c => c.problems);
+}
+
+function getStats() {
+  const all = getAllProblems();
+  const total = all.length;
+  const solved = all.filter(p => state.solved[p.id]).length;
+  const easy = all.filter(p => p.diff==='Easy');
+  const medium = all.filter(p => p.diff==='Medium');
+  const hard = all.filter(p => p.diff==='Hard');
+  return {
+    total, solved,
+    easy: easy.length, easySolved: easy.filter(p=>state.solved[p.id]).length,
+    medium: medium.length, mediumSolved: medium.filter(p=>state.solved[p.id]).length,
+    hard: hard.length, hardSolved: hard.filter(p=>state.solved[p.id]).length,
+  };
+}
+
+function renderHeader() {
+  const s = getStats();
+  document.getElementById('headerStats').innerHTML = `
+    <div class="stat-pill"><div class="dot" style="background:#22c55e"></div>${s.easySolved}/${s.easy} Easy</div>
+    <div class="stat-pill"><div class="dot" style="background:#f59e0b"></div>${s.mediumSolved}/${s.medium} Med</div>
+    <div class="stat-pill"><div class="dot" style="background:#ef4444"></div>${s.hardSolved}/${s.hard} Hard</div>
+  `;
+}
+
+function renderProgress() {
+  const s = getStats();
+  const pct = s.total ? Math.round(s.solved/s.total*100) : 0;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressBreakdown').innerHTML = `
+    <div class="pb-item"><div class="pb-dot" style="background:#22c55e"></div>${s.easySolved}/${s.easy} Easy</div>
+    <div class="pb-item"><div class="pb-dot" style="background:#f59e0b"></div>${s.mediumSolved}/${s.medium} Medium</div>
+    <div class="pb-item"><div class="pb-dot" style="background:#ef4444"></div>${s.hardSolved}/${s.hard} Hard</div>
+    <div class="pb-item" style="margin-left:auto"><strong style="color:var(--text)">${s.solved}</strong>&nbsp;/ ${s.total} total</div>
+  `;
+}
+
+function filterProblem(p) {
+  if (diffFilter && p.diff !== diffFilter) return false;
+  if (companyFilter && !p.companies.includes(companyFilter)) return false;
+  if (bookmarkFilter && !state.bookmarks[p.id]) return false;
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    if (!p.name.toLowerCase().includes(q)) return false;
+  }
+  return true;
+}
+
+function renderCategories() {
+  const container = document.getElementById('categoriesContainer');
+  const hasSearch = searchQuery || diffFilter || companyFilter || bookmarkFilter;
+
+  let html = '';
+  let anyVisible = false;
+
+  for (const cat of CATEGORIES) {
+    const filtered = cat.problems.filter(filterProblem);
+    if (filtered.length === 0) continue;
+    anyVisible = true;
+
+    const catTotal = cat.problems.length;
+    const catSolved = cat.problems.filter(p => state.solved[p.id]).length;
+    const catPct = catTotal ? Math.round(catSolved/catTotal*100) : 0;
+    const isOpen = hasSearch || !!state.openCats[cat.id];
+
+    html += `
+    <div class="category" id="cat-${cat.id}">
+      <div class="category-header" onclick="toggleCat('${cat.id}')">
+        <svg class="cat-chevron ${isOpen?'open':''}" id="chev-${cat.id}" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <div class="cat-icon" style="background:${cat.color}22">${cat.icon}</div>
+        <div class="cat-name">${cat.name}</div>
+        <div class="cat-count">${catSolved}/${catTotal}</div>
+        <div class="cat-progress-mini">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:${catPct}%;background:${cat.color}"></div></div>
+          <div class="mini-pct">${catPct}%</div>
+        </div>
+      </div>
+      <div class="problems-table ${isOpen?'open':''}" id="table-${cat.id}">
+        <div class="table-header">
+          <div></div><div>Problem</div><div>Difficulty</div><div>Companies</div><div>Notes</div><div></div><div></div>
+        </div>
+        ${filtered.map(p => renderProblemRow(p)).join('')}
+      </div>
+    </div>`;
+  }
+
+  if (!anyVisible) {
+    html = `<div class="empty-cats"><h3>No problems found</h3><p>Try adjusting your filters or search query.</p></div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function renderProblemRow(p) {
+  const solved = !!state.solved[p.id];
+  const bookmarked = !!state.bookmarks[p.id];
+  const hasNote = !!(state.notes[p.id] && state.notes[p.id].trim());
+  return `
+  <div class="problem-row ${solved?'solved':''}" id="row-${p.id}">
+    <div class="check-col">
+      <div class="check ${solved?'checked':''}" onclick="toggleSolved('${p.id}')" title="Mark as solved"></div>
+    </div>
+    <div class="prob-name">
+      <a href="${p.url}" target="_blank" rel="noopener" class="prob-link ${solved?'solved-text':''}">${p.name}</a>
+    </div>
+    <div class="diff-col">
+      <span class="diff-badge diff-${p.diff.toLowerCase()}">${p.diff}</span>
+    </div>
+    <div class="company-col">
+      <div class="company-tags">${p.companies.slice(0,2).map(c=>`<span class="company-tag">${c}</span>`).join('')}</div>
+    </div>
+    <div class="time-col" style="font-size:11px;color:var(--text3);font-family:var(--mono)">
+      ${solved && state.solved[p.id] !== true ? state.solved[p.id] : ''}
+    </div>
+    <div class="actions-col action-btns">
+      <button class="icon-btn ${bookmarked?'bookmarked':''}" onclick="toggleBookmark('${p.id}')" title="Bookmark">
+        <svg width="14" height="14" fill="${bookmarked?'currentColor':'none'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 3h14a1 1 0 0 1 1 1v17l-7-3-7 3V4a1 1 0 0 1 1-1z"/></svg>
+      </button>
+      <button class="icon-btn ${hasNote?'has-note':''}" onclick="openNote('${p.id}','${p.name.replace(/'/g,"\\'")}','${p.diff}')" title="Notes">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </button>
+    </div>
+    <div style="font-size:11px;color:var(--text3)"></div>
+  </div>`;
+}
+
+function render() {
+  renderHeader();
+  renderProgress();
+  renderCategories();
+}
+
+// ══════════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════════
+function toggleCat(id) {
+  if (state.openCats[id]) {
+    delete state.openCats[id];
+  } else {
+    state.openCats[id] = true;
+  }
+  saveState();
+
+  const table = document.getElementById('table-' + id);
+  const chev = document.getElementById('chev-' + id);
+  if (table) table.classList.toggle('open', !!state.openCats[id]);
+  if (chev) chev.classList.toggle('open', !!state.openCats[id]);
+}
+
+function toggleSolved(id) {
+  if (state.solved[id]) {
+    delete state.solved[id];
+  } else {
+    state.solved[id] = new Date().toLocaleDateString();
+  }
+  saveState();
+
+  // Update just the affected row & stats without full re-render
+  const row = document.getElementById('row-' + id);
+  if (row) {
+    const isSolved = !!state.solved[id];
+    row.classList.toggle('solved', isSolved);
+    const check = row.querySelector('.check');
+    const link = row.querySelector('.prob-link');
+    if (check) check.classList.toggle('checked', isSolved);
+    if (link) link.classList.toggle('solved-text', isSolved);
+  }
+  renderHeader();
+  renderProgress();
+  // Update category counts
+  for (const cat of CATEGORIES) {
+    if (cat.problems.find(p=>p.id===id)) {
+      const catTotal = cat.problems.length;
+      const catSolved = cat.problems.filter(p=>state.solved[p.id]).length;
+      const pct = catTotal ? Math.round(catSolved/catTotal*100) : 0;
+      const countEl = document.querySelector(`#cat-${cat.id} .cat-count`);
+      const fillEl = document.querySelector(`#cat-${cat.id} .mini-bar-fill`);
+      const pctEl = document.querySelector(`#cat-${cat.id} .mini-pct`);
+      if (countEl) countEl.textContent = `${catSolved}/${catTotal}`;
+      if (fillEl) fillEl.style.width = pct + '%';
+      if (pctEl) pctEl.textContent = pct + '%';
+      break;
+    }
+  }
+}
+
+function toggleBookmark(id) {
+  if (state.bookmarks[id]) delete state.bookmarks[id];
+  else state.bookmarks[id] = true;
+  saveState();
+
+  const row = document.getElementById('row-' + id);
+  if (row) {
+    const btn = row.querySelectorAll('.icon-btn')[0];
+    if (btn) {
+      const isB = !!state.bookmarks[id];
+      btn.classList.toggle('bookmarked', isB);
+      const svg = btn.querySelector('svg');
+      if (svg) svg.setAttribute('fill', isB ? 'currentColor' : 'none');
+    }
+  }
+  if (bookmarkFilter) render();
+}
+
+function toggleBookmarkFilter() {
+  bookmarkFilter = !bookmarkFilter;
+  const btn = document.getElementById('bookmarkFilterBtn');
+  btn.classList.toggle('active', bookmarkFilter);
+  render();
+}
+
+// Notes Modal
+function openNote(id, name, diff) {
+  currentNoteId = id;
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalSubtitle').textContent = diff + ' · LeetCode';
+  document.getElementById('noteTextarea').value = state.notes[id] || '';
+  document.getElementById('notesModal').classList.add('open');
+  setTimeout(()=>document.getElementById('noteTextarea').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('notesModal').classList.remove('open');
+  currentNoteId = null;
+}
+
+function saveNote() {
+  const val = document.getElementById('noteTextarea').value.trim();
+  if (val) state.notes[currentNoteId] = val;
+  else delete state.notes[currentNoteId];
+  saveState();
+  closeModal();
+  // Update icon
+  const row = document.getElementById('row-' + currentNoteId);
+  if (row) {
+    const btn = row.querySelectorAll('.icon-btn')[1];
+    if (btn) btn.classList.toggle('has-note', !!val);
+  }
+  showToast(val ? '📝 Note saved!' : 'Note cleared');
+  currentNoteId = null;
+}
+
+// Export / Import / Reset
+function exportData() {
+  const s = getStats();
+  const data = { ...state, exportedAt: new Date().toISOString(), stats: s };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dsa-progress-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Progress exported!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.solved) state.solved = data.solved;
+      if (data.bookmarks) state.bookmarks = data.bookmarks;
+      if (data.notes) state.notes = data.notes;
+      if (data.openCats) state.openCats = data.openCats;
+      saveState();
+      render();
+      showToast('✅ Progress imported!');
+    } catch(err) {
+      showToast('❌ Invalid file format');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetConfirm() {
+  if (confirm('Reset ALL progress? This cannot be undone.')) {
+    state = { solved:{}, bookmarks:{}, notes:{}, openCats:{} };
+    saveState();
+    render();
+    showToast('🗑️ Progress reset');
+  }
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Filters
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  render();
+});
+document.getElementById('diffFilter').addEventListener('change', e => {
+  diffFilter = e.target.value;
+  render();
+});
+document.getElementById('companyFilter').addEventListener('change', e => {
+  companyFilter = e.target.value;
+  render();
+});
+
+// Close modal on overlay click
+document.getElementById('notesModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Keyboard: Esc closes modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── Initial render ──
+render();
+</script>
+</body>
+</html>
